@@ -1,10 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const app = express();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-require('dotenv').config(); 
 const indexRoutes = require('./routes/index');
 
 // Import product and user routes
@@ -16,8 +16,8 @@ app.use(bodyParser.json());
 
 // Connecting to MongoDB
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('MongoDB connected'))
-    .catch(err => console.error(err));
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('Error connecting to MongoDB:', err));
 
 // Swagger configuration
 const swaggerOptions = {
