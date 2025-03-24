@@ -1,32 +1,26 @@
 const express = require('express');
-const cors = require('cors');
-const swaggerUi = require('swagger-ui-express');
-const swaggerDocs = require('./swagger.json');
-const connectDB = require('./data/database');
-require('dotenv').config();
-
 const app = express();
-const PORT = process.env.PORT || 3000;
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 
-// Middlewares
-app.use(cors());
-app.use(express.json());
+// Conectar a MongoDB (reemplaza con tu URL de conexión)
+mongoose.connect('mongodb+srv://AlejogvyDB:Alejandro10.@cluster0.mnlrm.mongodb.net/crud', { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => console.log('MongoDB connected'))
+    .catch(err => console.error(err));
 
-// Connect to database
-connectDB();
+// Middleware para parsear el cuerpo de las peticiones
+app.use(bodyParser.json());
 
-// Default route
-app.get('/', (req, res) => {
-    res.send('API is running...');
-});
+// Importar las rutas de productos
+const productRoutes = require('./routes/product'); // Verifica que la ruta sea correcta
+const userRoutes = require('./routes/users');
 
-// Routes
-app.use('/api', require('./routes'));
+// Usar las rutas de productos
+app.use('/api/products', productRoutes);
+app.use('/api/users', userRoutes);
 
-// Swagger documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-
-// Start server
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+// Iniciar el servidor
+const port = 3000;
+app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
 });
