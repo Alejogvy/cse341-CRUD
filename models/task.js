@@ -15,7 +15,7 @@ taskSchema.pre('save', function (next) {
     next();
 });
 
-// Optionally, you could also define an index for the `userId` for better performance
+// An index is defined for the `userId` for better performance.
 taskSchema.index({ userId: 1 });
 
 const Task = mongoose.model('Task', taskSchema);

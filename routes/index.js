@@ -30,7 +30,4 @@ router.use('/swagger', require('./swagger'));
 router.use('/products', require('./product'));
 router.use('/users', require('./users'));
 
-// Eliminar esta línea porque no es necesario
-// router.use('/index', require('./index'));
-
 module.exports = router;

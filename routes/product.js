@@ -1,6 +1,6 @@
 const express = require('express');
-const router = express.Router();  // Crear un Router de Express
-const Product = require('../models/Product');  // Asegúrate de que el modelo Product esté bien importado
+const router = express.Router();
+const Product = require('../models/Product');
 
 /**
  * @swagger
@@ -124,4 +124,4 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
-module.exports = router;  // Exportar el router
+module.exports = router;
