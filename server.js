@@ -2,24 +2,25 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+require('dotenv').config(); 
 
-// Conectar a MongoDB (reemplaza con tu URL de conexión)
-mongoose.connect('mongodb+srv://AlejogvyDB:Alejandro10.@cluster0.mnlrm.mongodb.net/crud', { useNewUrlParser: true, useUnifiedTopology: true })
+// Connecting to MongoDB
+mongoose.connect(process.env.MONGO_URI,)
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error(err));
 
-// Middleware para parsear el cuerpo de las peticiones
+// Middleware to parse the body of requests
 app.use(bodyParser.json());
 
-// Importar las rutas de productos
-const productRoutes = require('./routes/product'); // Verifica que la ruta sea correcta
+// Import product routes
+const productRoutes = require('./routes/product');
 const userRoutes = require('./routes/users');
 
-// Usar las rutas de productos
+// Using product routes
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 
-// Iniciar el servidor
+// Start the server
 const port = 3000;
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);

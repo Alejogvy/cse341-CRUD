@@ -1,10 +1,10 @@
-const User = require('../models/User'); // Asegúrate de tener el modelo User importado
-const ObjectId = require('mongoose').Types.ObjectId; // Usamos Mongoose para la conversión de ObjectId
+const User = require('../models/User');
+const ObjectId = require('mongoose').Types.ObjectId;
 
 // Get all users
 const getAll = async (req, res) => {
     try {
-        const users = await User.find(); // Usamos el modelo User de Mongoose para obtener todos los usuarios
+        const users = await User.find();
         res.setHeader('Content-Type', 'application/json');
         res.status(200).json(users);
     } catch (error) {
@@ -16,8 +16,8 @@ const getAll = async (req, res) => {
 // Get a single user by ID
 const getSingle = async (req, res) => {
     try {
-        const userId = req.params.id; // El parámetro id es un string, no es necesario convertirlo a ObjectId manualmente
-        const user = await User.findById(userId); // Usamos el método findById de Mongoose para encontrar el usuario por ID
+        const userId = req.params.id;
+        const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -40,7 +40,7 @@ const createUser = async (req, res) => {
             birthday: req.body.birthday
         });
 
-        const response = await user.save(); // Usamos el método save() de Mongoose para guardar el usuario
+        const response = await user.save();
         res.status(201).json({ message: 'User created', userId: response._id });
     } catch (error) {
         console.error('Error creating user:', error);
@@ -53,7 +53,7 @@ const updateUser = async (req, res) => {
     try {
         const userId = req.params.id;
 
-        // Extraemos los campos del usuario, excluyendo el cumpleaños
+        // We extract the user fields, excluding the birthday
         const userUpdates = {
             firstName: req.body.firstName,
             lastName: req.body.lastName,
@@ -61,7 +61,7 @@ const updateUser = async (req, res) => {
             favoriteColor: req.body.favoriteColor
         };
 
-        const response = await User.findByIdAndUpdate(userId, userUpdates, { new: true }); // Usamos findByIdAndUpdate de Mongoose
+        const response = await User.findByIdAndUpdate(userId, userUpdates, { new: true });
         if (response) {
             res.status(200).json({ message: 'User updated', user: response });
         } else {
@@ -77,7 +77,7 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
     try {
         const userId = req.params.id;
-        const response = await User.findByIdAndDelete(userId); // Usamos findByIdAndDelete de Mongoose
+        const response = await User.findByIdAndDelete(userId);
 
         if (response) {
             res.status(200).json({ message: 'User deleted' });
