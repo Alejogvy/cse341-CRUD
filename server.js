@@ -46,4 +46,5 @@ app.use('/', indexRoutes);
 const port = 3000;
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
+    console.log('Swagger UI available at http://localhost:3000/api-docs');
 });
