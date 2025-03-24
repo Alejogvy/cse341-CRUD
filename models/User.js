@@ -1,11 +1,19 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
+    name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    favoriteColor: { type: String },
-    birthday: { type: Date, required: true }
+    password: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('User', userSchema);
+// Middleware to update `updatedAt` on every save
+userSchema.pre('save', function (next) {
+    this.updatedAt = Date.now();
+    next();
+});
+
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;

@@ -10,4 +10,12 @@ const productSchema = new mongoose.Schema({
     updatedAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Product', productSchema);
+// Middleware to update `updatedAt` on every save
+productSchema.pre('save', function (next) {
+    this.updatedAt = Date.now();
+    next();
+});
+
+const Product = mongoose.model('Product', productSchema);
+
+module.exports = Product;
