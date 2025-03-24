@@ -8,7 +8,7 @@ router.get('/', (req, res) => {
     res.send('Hello World');
 });
 
-// Agregar la ruta de productos
+// Product route
 router.use('/products', require('./product'));
 
 router.use('/users', require('./users'));

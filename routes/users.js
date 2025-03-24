@@ -1,9 +1,8 @@
-// routes/user.js
 const express = require('express');
 const User = require('../models/User');
 const router = express.Router();
 
-// Crear un nuevo usuario
+// Create a new user
 router.post('/', async (req, res) => {
     const { name, email, password, role, isActive } = req.body;
     try {
@@ -21,7 +20,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Obtener todos los usuarios
+// Get all users
 router.get('/', async (req, res) => {
     try {
         const users = await User.find();

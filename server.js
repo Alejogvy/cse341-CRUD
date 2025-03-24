@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocs = require('./swagger.json'); // Asegúrate de que sea un archivo válido
+const swaggerDocs = require('./swagger.json');
 const connectDB = require('./data/database');
 require('dotenv').config();
 

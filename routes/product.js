@@ -1,9 +1,8 @@
-// routes/product.js
 const express = require('express');
 const Product = require('../models/product');
 const router = express.Router();
 
-// Crear un nuevo producto
+// Create a new product
 router.post('/', async (req, res) => {
     const { name, category, price, stock, description } = req.body;
     try {
@@ -21,7 +20,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Obtener todos los productos
+// Get all products
 router.get('/', async (req, res) => {
     try {
         const products = await Product.find();

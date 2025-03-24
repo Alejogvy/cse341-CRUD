@@ -1,6 +1,6 @@
 const Product = require('../models/product');
 
-// Crear un producto
+// Create a product
 const createProduct = async (req, res) => {
     try {
         const { name, description, price, category, stock } = req.body;
@@ -12,7 +12,7 @@ const createProduct = async (req, res) => {
     }
 };
 
-// Obtener todos los productos
+// Get all products
 const getProducts = async (req, res) => {
     try {
         const products = await Product.find();
@@ -22,7 +22,7 @@ const getProducts = async (req, res) => {
     }
 };
 
-// Obtener un producto por ID
+// Get a product by ID
 const getProduct = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
@@ -33,7 +33,7 @@ const getProduct = async (req, res) => {
     }
 };
 
-// Actualizar un producto
+// Update a product
 const updateProduct = async (req, res) => {
     try {
         const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -44,7 +44,7 @@ const updateProduct = async (req, res) => {
     }
 };
 
-// Eliminar un producto
+// Delete a product
 const deleteProduct = async (req, res) => {
     try {
         const product = await Product.findByIdAndDelete(req.params.id);
