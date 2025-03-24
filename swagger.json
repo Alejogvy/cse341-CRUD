@@ -1,0 +1,63 @@
+{
+  "swagger": "2.0",
+  "info": {
+      "title": "CRUD API - Products",
+      "description": "API to manage products",
+      "version": "1.0.0"
+  },
+  "paths": {
+      "/products": {
+          "get": {
+              "summary": "Get all products",
+              "responses": {
+                  "200": {
+                      "description": "List of products"
+                  }
+              }
+          },
+          "post": {
+              "summary": "Create a new product",
+              "responses": {
+                  "201": {
+                      "description": "Product created"
+                  }
+              }
+          }
+      },
+      "/products/{id}": {
+          "get": {
+              "summary": "Get a product by ID",
+              "responses": {
+                  "200": {
+                      "description": "Product found"
+                  },
+                  "404": {
+                      "description": "Product not found"
+                  }
+              }
+          },
+          "put": {
+              "summary": "Update a product by ID",
+              "responses": {
+                  "200": {
+                      "description": "Product updated"
+                  },
+                  "404": {
+                      "description": "Product not found"
+                  }
+              }
+          },
+          "delete": {
+              "summary": "Delete a product by ID",
+              "responses": {
+                  "200": {
+                      "description": "Product deleted"
+                  },
+                  "404": {
+                      "description": "Product not found"
+                  }
+              }
+          }
+      }
+  }
+}
