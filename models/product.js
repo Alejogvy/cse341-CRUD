@@ -10,10 +10,18 @@ const productSchema = new mongoose.Schema({
     updatedAt: { type: Date, default: Date.now }
 });
 
-// Middleware to update `updatedAt` on every save
+// Middleware to update updatedAt on every save
 productSchema.pre('save', function (next) {
     this.updatedAt = Date.now();
     next();
+});
+
+// Hide __v in JSON output
+productSchema.set('toJSON', {
+    transform: (doc, ret) => {
+        delete ret.__v;
+        return ret;
+    }
 });
 
 const Product = mongoose.model('Product', productSchema);
