@@ -1,10 +1,11 @@
 const User = require('../models/User');
 const ObjectId = require('mongoose').Types.ObjectId;
+const bcrypt = require('bcrypt'); // Para encriptar el password
 
-// Get all users
+// Obtener todos los usuarios
 const getAll = async (req, res) => {
     try {
-        const users = await User.find();
+        const users = await User.find().select('-password'); // Ocultar password
         res.setHeader('Content-Type', 'application/json');
         res.status(200).json(users);
     } catch (error) {
@@ -13,7 +14,7 @@ const getAll = async (req, res) => {
     }
 };
 
-// Get a single user by ID
+// Obtener un usuario por ID
 const getSingle = async (req, res) => {
     try {
         const userId = req.params.id;
@@ -21,7 +22,7 @@ const getSingle = async (req, res) => {
             return res.status(400).json({ message: 'Invalid user ID' });
         }
 
-        const user = await User.findById(userId);
+        const user = await User.findById(userId).select('-password'); // Ocultar password
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -33,20 +34,24 @@ const getSingle = async (req, res) => {
     }
 };
 
-// Create a new user
+// Crear un nuevo usuario
 const createUser = async (req, res) => {
-    const { firstName, lastName, email, favoriteColor, birthday } = req.body;
+    const { firstName, lastName, email, password, favoriteColor, birthday } = req.body;
 
-    // Data validation
-    if (!firstName || !lastName || !email || !favoriteColor || !birthday) {
-        return res.status(400).json({ message: 'All fields (firstName, lastName, email, favoriteColor, birthday) are required.' });
+    // Validación de datos
+    if (!firstName || !lastName || !email || !password) {
+        return res.status(400).json({ message: 'All fields (firstName, lastName, email, password) are required.' });
     }
 
     try {
+        // Hashear password antes de guardar
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         const user = new User({
             firstName,
             lastName,
             email,
+            password: hashedPassword, // Guardar password encriptado
             favoriteColor,
             birthday
         });
@@ -59,14 +64,14 @@ const createUser = async (req, res) => {
     }
 };
 
-// Update an existing user (excluding birthday)
+// Actualizar un usuario (excluyendo el password)
 const updateUser = async (req, res) => {
     const userId = req.params.id;
     const { firstName, lastName, email, favoriteColor } = req.body;
 
-    // Data validation
+    // Validación de datos
     if (!firstName && !lastName && !email && !favoriteColor) {
-        return res.status(400).json({ message: 'At least one field (firstName, lastName, email, favoriteColor) must be provided.' });
+        return res.status(400).json({ message: 'At least one field must be provided for update.' });
     }
 
     try {
@@ -74,26 +79,28 @@ const updateUser = async (req, res) => {
             return res.status(400).json({ message: 'Invalid user ID' });
         }
 
+        // Verificar si el usuario existe antes de actualizar
+        const existingUser = await User.findById(userId);
+        if (!existingUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
         const userUpdates = {
-            firstName,
-            lastName,
-            email,
-            favoriteColor
+            firstName: firstName || existingUser.firstName,
+            lastName: lastName || existingUser.lastName,
+            email: email || existingUser.email,
+            favoriteColor: favoriteColor || existingUser.favoriteColor
         };
 
-        const response = await User.findByIdAndUpdate(userId, userUpdates, { new: true });
-        if (response) {
-            res.status(200).json({ message: 'User updated', user: response });
-        } else {
-            res.status(404).json({ message: 'User not found' });
-        }
+        const updatedUser = await User.findByIdAndUpdate(userId, userUpdates, { new: true }).select('-password'); // Ocultar password
+        res.status(200).json({ message: 'User updated', user: updatedUser });
     } catch (error) {
         console.error('Error updating user:', error);
         res.status(500).json({ message: 'Error updating user', error });
     }
 };
 
-// Delete a user by ID
+// Eliminar un usuario por ID
 const deleteUser = async (req, res) => {
     const userId = req.params.id;
 
