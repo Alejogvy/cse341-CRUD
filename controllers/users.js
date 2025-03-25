@@ -17,6 +17,10 @@ const getAll = async (req, res) => {
 const getSingle = async (req, res) => {
     try {
         const userId = req.params.id;
+        if (!ObjectId.isValid(userId)) {
+            return res.status(400).json({ message: 'Invalid user ID' });
+        }
+
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -31,13 +35,20 @@ const getSingle = async (req, res) => {
 
 // Create a new user
 const createUser = async (req, res) => {
+    const { firstName, lastName, email, favoriteColor, birthday } = req.body;
+
+    // Data validation
+    if (!firstName || !lastName || !email || !favoriteColor || !birthday) {
+        return res.status(400).json({ message: 'All fields (firstName, lastName, email, favoriteColor, birthday) are required.' });
+    }
+
     try {
         const user = new User({
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            email: req.body.email,
-            favoriteColor: req.body.favoriteColor,
-            birthday: req.body.birthday
+            firstName,
+            lastName,
+            email,
+            favoriteColor,
+            birthday
         });
 
         const response = await user.save();
@@ -50,15 +61,24 @@ const createUser = async (req, res) => {
 
 // Update an existing user (excluding birthday)
 const updateUser = async (req, res) => {
-    try {
-        const userId = req.params.id;
+    const userId = req.params.id;
+    const { firstName, lastName, email, favoriteColor } = req.body;
 
-        // We extract the user fields, excluding the birthday
+    // Data validation
+    if (!firstName && !lastName && !email && !favoriteColor) {
+        return res.status(400).json({ message: 'At least one field (firstName, lastName, email, favoriteColor) must be provided.' });
+    }
+
+    try {
+        if (!ObjectId.isValid(userId)) {
+            return res.status(400).json({ message: 'Invalid user ID' });
+        }
+
         const userUpdates = {
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            email: req.body.email,
-            favoriteColor: req.body.favoriteColor
+            firstName,
+            lastName,
+            email,
+            favoriteColor
         };
 
         const response = await User.findByIdAndUpdate(userId, userUpdates, { new: true });
@@ -75,8 +95,13 @@ const updateUser = async (req, res) => {
 
 // Delete a user by ID
 const deleteUser = async (req, res) => {
+    const userId = req.params.id;
+
     try {
-        const userId = req.params.id;
+        if (!ObjectId.isValid(userId)) {
+            return res.status(400).json({ message: 'Invalid user ID' });
+        }
+
         const response = await User.findByIdAndDelete(userId);
 
         if (response) {

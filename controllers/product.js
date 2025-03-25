@@ -3,13 +3,15 @@ const mongoose = require('mongoose');
 
 // Create a new product
 exports.createProduct = async (req, res) => {
-    try {
-        const { name, price } = req.body;
-        if (!name || !price) {
-            return res.status(400).json({ message: 'Name and price are required' });
-        }
+    const { name, price } = req.body;
 
-        const product = new Product(req.body);
+    // Data validation
+    if (!name || !price) {
+        return res.status(400).json({ message: 'Name and price are required' });
+    }
+
+    try {
+        const product = new Product({ name, price });
         await product.save();
 
         res.status(201).json({
@@ -33,12 +35,19 @@ exports.getProducts = async (req, res) => {
 
 // Update a product
 exports.updateProduct = async (req, res) => {
+    const { name, price } = req.body;
+
+    // Data validation
+    if (!name || !price) {
+        return res.status(400).json({ message: 'Name and price are required' });
+    }
+
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
             return res.status(400).json({ message: 'Invalid product ID' });
         }
 
-        const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+        const product = await Product.findByIdAndUpdate(req.params.id, { name, price }, {
             new: true,
             runValidators: true
         });
