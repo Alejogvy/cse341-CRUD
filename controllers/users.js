@@ -41,12 +41,12 @@ const createUser = async (req, res) => {
         
         if (!firstName || !lastName || !email || !password) {
             return res.status(400).json({
-                message: 'Campos requeridos faltantes',
+                message: 'Missing required fields',
                 requiredFields: {
-                    firstName: !firstName && 'Requerido',
-                    lastName: !lastName && 'Requerido',
-                    email: !email && 'Requerido',
-                    password: !password && 'Requerido'
+                    firstName: !firstName && 'Requested',
+                    lastName: !lastName && 'Requested',
+                    email: !email && 'Requested',
+                    password: !password && 'Requested'
                 },
                 optionalFields: ['favoriteColor', 'birthday']
             });
@@ -73,12 +73,12 @@ const createUser = async (req, res) => {
     } catch (error) {
         if (error.code === 11000) {
             return res.status(400).json({ 
-                message: 'El correo electrónico ya está registrado',
+                message: 'The email is already registered',
                 error: 'EMAIL_EXISTS'
             });
         }
         res.status(500).json({ 
-            message: 'Error del servidor',
+            message: 'Server error',
             error: error.message 
         });
     }

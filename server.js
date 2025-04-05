@@ -22,15 +22,23 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true               
+  origin: 'https://cse341-crud-uv92.onrender.com',
+  credentials: true
 }));
 
 app.use(session({
-  secret: process.env.SESSION_SECRET || "fallback-secret",
+  secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: true,
-  cookie: { secure: true } // We switched to true in production with HTTPS
+  saveUninitialized: false,
+  cookie: {
+      secure: true,
+      sameSite: 'none',
+      domain: 'cse341-crud-uv92.onrender.com'
+  },
+  store: MongoStore.create({ 
+      mongoUrl: process.env.MONGO_URI,
+      ttl: 24 * 60 * 60 // 1 day
+  })
 }));
 
 app.use(passport.initialize());

@@ -8,13 +8,13 @@ exports.createProduct = async (req, res) => {
         
         if (!name || !description || !price || !category || !stock) {
             return res.status(400).json({
-                message: 'Faltan campos requeridos',
+                message: 'Required fields are missing',
                 requiredFields: {
-                    name: !name && 'Requerido',
-                    description: !description && 'Requerido',
-                    price: !price && 'Requerido',
-                    category: !category && 'Requerido',
-                    stock: !stock && 'Requerido'
+                    name: !name && 'Requested',
+                    description: !description && 'Requested',
+                    price: !price && 'Requested',
+                    category: !category && 'Requested',
+                    stock: !stock && 'Requested'
                 }
             });
         }
@@ -32,7 +32,7 @@ exports.createProduct = async (req, res) => {
         res.status(201).json(product);
     } catch (error) {
         res.status(400).json({ 
-            message: 'Error de validación',
+            message: 'Validation error',
             error: error.message,
             validationErrors: error.errors
         });

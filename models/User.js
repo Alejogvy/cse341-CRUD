@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
 
 // Hook to encrypt password before saving
 userSchema.pre('save', async function (next) {
-    // Si la contraseña no ha sido modificada, no hacemos nada
+    // If the password has not been changed, nothing is changed.
     if (!this.isModified('password')) return next();
 
     try {
