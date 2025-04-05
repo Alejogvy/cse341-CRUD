@@ -34,69 +34,90 @@ const getSingle = async (req, res) => {
     }
 };
 
-// Create a new user
+// Create user
 const createUser = async (req, res) => {
-    const { firstName, lastName, email, password, favoriteColor, birthday } = req.body;
-
-    // Data validation
-    if (!firstName || !lastName || !email || !password) {
-        return res.status(400).json({ message: 'All fields (firstName, lastName, email, password) are required.' });
-    }
-
     try {
-        // Hash password before saving
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const { firstName, lastName, email, password, favoriteColor, birthday } = req.body;
+        
+        if (!firstName || !lastName || !email || !password) {
+            return res.status(400).json({
+                message: 'Campos requeridos faltantes',
+                requiredFields: {
+                    firstName: !firstName && 'Requerido',
+                    lastName: !lastName && 'Requerido',
+                    email: !email && 'Requerido',
+                    password: !password && 'Requerido'
+                },
+                optionalFields: ['favoriteColor', 'birthday']
+            });
+        }
 
+        const hashedPassword = await bcrypt.hash(password, 10);
         const user = new User({
             firstName,
             lastName,
             email,
-            password: hashedPassword, // Save encrypted password
+            password: hashedPassword,
             favoriteColor,
-            birthday
+            birthday: birthday ? new Date(birthday) : null
         });
 
-        const response = await user.save();
-        res.status(201).json({ message: 'User created', userId: response._id });
+        await user.save();
+        
+        res.status(201).json({
+            _id: user._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email
+        });
     } catch (error) {
-        console.error('Error creating user:', error);
-        res.status(500).json({ message: 'Error creating user', error });
+        if (error.code === 11000) {
+            return res.status(400).json({ 
+                message: 'El correo electrónico ya está registrado',
+                error: 'EMAIL_EXISTS'
+            });
+        }
+        res.status(500).json({ 
+            message: 'Error del servidor',
+            error: error.message 
+        });
     }
 };
 
-// Update a user (excluding password)
+// Update user
 const updateUser = async (req, res) => {
-    const userId = req.params.id;
-    const { firstName, lastName, email, favoriteColor } = req.body;
-
-    // Data validation
-    if (!firstName && !lastName && !email && !favoriteColor) {
-        return res.status(400).json({ message: 'At least one field must be provided for update.' });
-    }
-
     try {
-        if (!ObjectId.isValid(userId)) {
-            return res.status(400).json({ message: 'Invalid user ID' });
+        const { firstName, lastName, email } = req.body;
+        
+        // Flexible validation for update
+        if (!firstName && !lastName && !email) {
+            return res.status(400).json({ 
+                message: 'At least one field is required',
+                acceptableFields: ['firstName', 'lastName', 'email']
+            });
         }
 
-        // Check if the user exists before updating
-        const existingUser = await User.findById(userId);
-        if (!existingUser) {
+        const updates = {};
+        if (firstName) updates.firstName = firstName;
+        if (lastName) updates.lastName = lastName;
+        if (email) updates.email = email;
+
+        const user = await User.findByIdAndUpdate(
+            req.params.id,
+            updates,
+            { new: true, runValidators: true }
+        ).select('-password');
+
+        if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-
-        const userUpdates = {
-            firstName: firstName || existingUser.firstName,
-            lastName: lastName || existingUser.lastName,
-            email: email || existingUser.email,
-            favoriteColor: favoriteColor || existingUser.favoriteColor
-        };
-
-        const updatedUser = await User.findByIdAndUpdate(userId, userUpdates, { new: true }).select('-password');
-        res.status(200).json({ message: 'User updated', user: updatedUser });
+        
+        res.status(200).json(user);
     } catch (error) {
-        console.error('Error updating user:', error);
-        res.status(500).json({ message: 'Error updating user', error });
+        res.status(500).json({ 
+            message: 'Server error',
+            error: error.message 
+        });
     }
 };
 

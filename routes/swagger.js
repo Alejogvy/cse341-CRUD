@@ -1,23 +1,19 @@
-const router = require('express').Router();
+const express = require('express');
+const router = express.Router();
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('../swagger.json');
 
-// Serve Swagger UI
-router.use('/api-docs', swaggerUi.serve);
-router.get('/api-docs', swaggerUi.setup(swaggerDocument));
+// Options for Swagger UI to send credentials (cookies)
+const swaggerUiOptions = {
+  swaggerOptions: {
+    requestInterceptor: (req) => {
+      req.withCredentials = true;
+      return req;
+    }
+  }
+};
 
-// Users documentation
-router.get('/api-docs/users', (req, res) => {
-    res.json({
-        message: 'Endpoints for Users',
-        endpoints: [
-            { method: 'POST', path: '/users', description: 'Create a new user' },
-            { method: 'GET', path: '/users', description: 'Get all users' },
-            { method: 'GET', path: '/users/:id', description: 'Get a user by ID' },
-            { method: 'PUT', path: '/users/:id', description: 'Update a user by ID' },
-            { method: 'DELETE', path: '/users/:id', description: 'Delete a user by ID' },
-        ]
-    });
-});
+// Protects documentation or can be disabled for testing.
+router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerUiOptions));
 
 module.exports = router;

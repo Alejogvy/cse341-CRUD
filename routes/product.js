@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/product');
+const isAuthenticated = require("../middleware/authenticate");
 
 /**
  * @swagger
@@ -86,11 +87,22 @@ router.post('/', async (req, res) => {
  *     responses:
  *       200:
  *         description: Product updated successfully
+ *       404:
+ *         description: Product not found
  */
-router.put('/:id', async (req, res) => {
+router.put('/:id', isAuthenticated, async (req, res) => {
     try {
-        const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const { name, price } = req.body;
+
+        // Validate that the data is correct
+        if (!name || !price) {
+            return res.status(400).json({ message: 'Name and price are required' });
+        }
+
+        // Try to update the product by ID
+        const product = await Product.findByIdAndUpdate(req.params.id, { name, price }, { new: true });
         if (!product) return res.status(404).json({ message: 'Product not found' });
+
         res.status(200).json(product);
     } catch (error) {
         res.status(400).json({ message: 'Error updating product', error: error.message });
@@ -113,11 +125,15 @@ router.put('/:id', async (req, res) => {
  *     responses:
  *       204:
  *         description: Product deleted successfully
+ *       404:
+ *         description: Product not found
  */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', isAuthenticated, async (req, res) => {
     try {
+        // Try to delete the product by ID
         const product = await Product.findByIdAndDelete(req.params.id);
         if (!product) return res.status(404).json({ message: 'Product not found' });
+
         res.status(204).send();
     } catch (error) {
         res.status(500).json({ message: 'Error deleting product', error: error.message });

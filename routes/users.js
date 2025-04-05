@@ -1,6 +1,7 @@
 const express = require('express');
-const { getAll, getSingle, createUser, updateUser, deleteUser } = require('../controllers/users');
 const router = express.Router();
+const isAuthenticated = require("../middleware/authenticate");
+const { getAll, getSingle, createUser, updateUser, deleteUser } = require('../controllers/users');
 
 /**
  * @swagger
@@ -22,7 +23,9 @@ const router = express.Router();
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               firstName:
+ *                 type: string
+ *               lastName:
  *                 type: string
  *               email:
  *                 type: string
@@ -32,7 +35,15 @@ const router = express.Router();
  *       201:
  *         description: User created successfully
  */
-router.post('/', createUser);
+router.post('/', createUser, async (req, res) => {
+    try {
+        const users = new Users(req.body);
+        await users.save();
+        res.status(201).json(Users);
+    } catch (error) {
+        res.status(400).json({ message: 'Error creating product', error: error.message });
+    }
+});
 
 /**
  * @swagger
@@ -44,7 +55,13 @@ router.post('/', createUser);
  *       200:
  *         description: List of users
  */
-router.get('/', getAll);
+router.get('/', isAuthenticated, async (req, res) => {
+    try {
+        await getAll(req, res);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching users', error: error.message });
+    }
+});
 
 /**
  * @swagger
@@ -65,7 +82,13 @@ router.get('/', getAll);
  *       404:
  *         description: User not found
  */
-router.get('/:id', getSingle);
+router.get('/:id', isAuthenticated, async (req, res) => {
+    try {
+        await getSingle(req, res);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching user', error: error.message });
+    }
+});
 
 /**
  * @swagger
@@ -87,7 +110,9 @@ router.get('/:id', getSingle);
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               firstName:
+ *                 type: string
+ *               lastName:
  *                 type: string
  *               email:
  *                 type: string
@@ -99,7 +124,17 @@ router.get('/:id', getSingle);
  *       404:
  *         description: User not found
  */
-router.put('/:id', updateUser);
+router.put('/:id', isAuthenticated, async (req, res) => {
+    try {
+        const { firstName, lastName, email, password } = req.body;
+        if (!firstName || !lastName || !email || !password) {
+            return res.status(400).json({ message: 'firstName, lastName, email, and password are required' });
+        }
+        await updateUser(req, res);
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating user', error: error.message });
+    }
+});
 
 /**
  * @swagger
@@ -120,6 +155,12 @@ router.put('/:id', updateUser);
  *       404:
  *         description: User not found
  */
-router.delete('/:id', deleteUser);
+router.delete('/:id', isAuthenticated, async (req, res) => {
+    try {
+        await deleteUser(req, res);
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting user', error: error.message });
+    }
+});
 
 module.exports = router;

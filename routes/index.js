@@ -3,13 +3,6 @@ const router = express.Router();
 
 /**
  * @swagger
- * tags:
- *   name: HelloWorld
- *   description: A simple hello world route for testing
- */
-
-/**
- * @swagger
  * /:
  *   get:
  *     summary: Hello World endpoint
@@ -19,15 +12,30 @@ const router = express.Router();
  *         description: A simple hello world message
  */
 router.get('/', (req, res) => {
-    //#swagger.tags=['Hello World']
     res.send('Hello World');
 });
 
-// Swagger route for API documentation
-router.use('/swagger', require('./swagger'));
-
-// Routes for product and user resources
+// Routes for products and users
 router.use('/products', require('./product'));
 router.use('/users', require('./users'));
+
+/**
+ * @swagger
+ * /logout:
+ *   get:
+ *     summary: Logs out the user
+ *     tags: [Authentication]
+ *     responses:
+ *       200:
+ *         description: User logged out successfully
+ */
+router.get('/logout', (req, res, next) => {
+    req.logout(err => {
+        if (err) return next(err);
+        req.session.destroy(() => {
+            res.redirect('/');
+        });
+    });
+});
 
 module.exports = router;

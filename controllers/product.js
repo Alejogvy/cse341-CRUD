@@ -3,23 +3,39 @@ const mongoose = require('mongoose');
 
 // Create a new product
 exports.createProduct = async (req, res) => {
-    const { name, price } = req.body;
-
-    // Data validation
-    if (!name || !price) {
-        return res.status(400).json({ message: 'Name and price are required' });
-    }
-
     try {
-        const product = new Product({ name, price });
-        await product.save();
+        const { name, description, price, category, stock } = req.body;
+        
+        if (!name || !description || !price || !category || !stock) {
+            return res.status(400).json({
+                message: 'Faltan campos requeridos',
+                requiredFields: {
+                    name: !name && 'Requerido',
+                    description: !description && 'Requerido',
+                    price: !price && 'Requerido',
+                    category: !category && 'Requerido',
+                    stock: !stock && 'Requerido'
+                }
+            });
+        }
 
-        res.status(201).json({
-            message: 'Product created successfully',
-            product
+        const product = new Product({
+            name,
+            description,
+            price: Number(price),
+            category,
+            stock: Number(stock)
         });
+
+        await product.save();
+        
+        res.status(201).json(product);
     } catch (error) {
-        res.status(500).json({ message: 'Error creating product', error: error.message });
+        res.status(400).json({ 
+            message: 'Error de validación',
+            error: error.message,
+            validationErrors: error.errors
+        });
     }
 };
 
@@ -68,18 +84,15 @@ exports.updateProduct = async (req, res) => {
 // Delete a product
 exports.deleteProduct = async (req, res) => {
     try {
-        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-            return res.status(400).json({ message: 'Invalid product ID' });
-        }
-
         const product = await Product.findByIdAndDelete(req.params.id);
-
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
-
         res.status(204).send();
     } catch (error) {
-        res.status(500).json({ message: 'Error deleting product', error: error.message });
+        res.status(500).json({ 
+            message: 'Server error',
+            error: error.message 
+        });
     }
 };
