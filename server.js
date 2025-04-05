@@ -10,6 +10,7 @@ const GitHubStrategy = require('passport-github2').Strategy;
 const cors = require('cors');
 const isAuthenticated = require('./middleware/authenticate');
 require('./config/passport');
+const MongoStore = require('connect-mongo');
 
 // Importing routes
 const indexRoutes = require('./routes/index');
@@ -28,17 +29,18 @@ app.use(cors({
 
 app.use(session({
   secret: process.env.SESSION_SECRET,
+  store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+      ttl: 14 * 24 * 60 * 60 // = 14 days. Default
+  }),
   resave: false,
   saveUninitialized: false,
   cookie: {
-      secure: true,
-      sameSite: 'none',
-      domain: 'cse341-crud-uv92.onrender.com'
-  },
-  store: MongoStore.create({ 
-      mongoUrl: process.env.MONGO_URI,
-      ttl: 24 * 60 * 60 // 1 day
-  })
+      secure: true, //  HTTPS
+      sameSite: 'none', // cross-site
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 // 1 day
+  }
 }));
 
 app.use(passport.initialize());

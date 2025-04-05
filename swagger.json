@@ -16,7 +16,7 @@
       "flow": "implicit",
       "authorizationUrl": "https://github.com/login/oauth/authorize",
       "scopes": {
-        "user": "Acceso a la información del usuario"
+        "user": "Access to user information"
       }
     }
   },
@@ -35,12 +35,12 @@
     "/login": {
       "get": {
         "tags": ["Auth"],
-        "summary": "Iniciar sesión con GitHub",
-        "description": "Redirige a GitHub para autenticación OAuth",
+        "summary": "Sign in with GitHub",
+        "description": "Redirect to GitHub for OAuth authentication",
         "security": [{ "oauth2": [] }],
         "responses": {
           "302": {
-            "description": "Redirección a GitHub"
+            "description": "Redirect to GitHub"
           }
         }
       }
@@ -49,10 +49,10 @@
       "get": {
         "tags": ["Auth"],
         "summary": "Callback de GitHub",
-        "description": "GitHub redirige aquí después del login",
+        "description": "GitHub redirects here after login",
         "responses": {
           "302": {
-            "description": "Redirección a la página principal"
+            "description": "Redirection to the home page"
           }
         }
       }
@@ -60,11 +60,11 @@
     "/logout": {
       "get": {
         "tags": ["Auth"],
-        "summary": "Cerrar sesión",
-        "description": "Cierra la sesión del usuario autenticado",
+        "summary": "Log out",
+        "description": "Logs out the authenticated user",
         "responses": {
           "200": {
-            "description": "Sesión cerrada correctamente"
+            "description": "Session successfully closed"
           }
         }
       }
@@ -72,7 +72,7 @@
     "/users/": {
       "get": {
         "tags": ["Users"],
-        "description": "Obtener lista de usuarios",
+        "description": "Get user lists",
         "produces": ["application/json"],
         "security": [{ "oauth2": [] }],
         "responses": {
