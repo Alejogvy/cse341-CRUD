@@ -14,7 +14,8 @@ const isAuthenticated = require("../middleware/authenticate");
  * @swagger
  * /api/products:
  *   get:
- *     summary: Get all products
+ *     security:
+ *       - sessionAuth: []
  *     tags: [Products]
  *     responses:
  *       200:

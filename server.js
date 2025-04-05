@@ -17,14 +17,18 @@ const userRoutes = require('./routes/users');
 
 const app = express();
 
+// server.js (antes de los middlewares de sesión y CORS)
+app.set('trust proxy', 1); // Añade esta línea
+
 // Configuración de sesión dinámica por entorno
 const sessionConfig = {
   secret: process.env.SESSION_SECRET || "fallback-secret",
   resave: false,
   saveUninitialized: true,
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // true en producción
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    secure: true, // Fuerza HTTPS en producción
+    sameSite: 'none', // Necesario para cross-site
+    maxAge: 24 * 60 * 60 * 1000 // 1 día en ms
   }
 };
 
@@ -52,6 +56,8 @@ app.use(passport.session());
 
 // Headers CORS
 app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "https://cse341-crud-uv92.onrender.com");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Z-Key");
   res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, OPTIONS, DELETE");
   next();
