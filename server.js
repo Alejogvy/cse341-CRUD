@@ -27,10 +27,13 @@ app.use(cors({
 }));
 
 app.use(session({
-  secret: process.env.SESSION_SECRET || "fallback-secret",
+  secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false } // We switched to true in production with HTTPS
+  saveUninitialized: false,
+  cookie: {
+    secure: true, // Importante: debe ser true en producción
+    sameSite: 'none'
+  }
 }));
 
 app.use(passport.initialize());
@@ -52,7 +55,7 @@ app.get('/login', (req, res) => {
 
 app.get('/auth/github', passport.authenticate('github', { scope: ['user:email'] }));
 
-app.get('/github/callback', 
+app.get('/auth/github/callback', 
   passport.authenticate('github', { 
       failureRedirect: '/login',
       successRedirect: '/api-docs'
