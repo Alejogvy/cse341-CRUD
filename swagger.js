@@ -1,10 +1,9 @@
 const swaggerAutogen = require('swagger-autogen')();
 
-// swagger.js (dentro de las opciones de Swagger UI)
 const swaggerUiOptions = {
     swaggerOptions: {
       requestInterceptor: (req) => {
-        req.credentials = 'include'; // Asegura que las cookies se envíen
+        req.credentials = 'include';
         return req;
       }
     }

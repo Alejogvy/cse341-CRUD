@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
-const MongoStore = require('connect-mongo'); // Nuevo: almacenamiento de sesiones
+const MongoStore = require('connect-mongo');
 const passport = require('passport');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
@@ -10,33 +10,32 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const isAuthenticated = require('./middleware/authenticate');
 require('./config/passport');
 
-// Importar rutas
+// Imported routes
 const indexRoutes = require('./routes/index');
 const productRoutes = require('./routes/product');
 const userRoutes = require('./routes/users');
 
 const app = express();
 
-// server.js (antes de los middlewares de sesión y CORS)
-app.set('trust proxy', 1); // Añade esta línea
+app.set('trust proxy', 1);
 
-// Configuración de sesión dinámica por entorno
+// Dynamic session configuration per environment
 const sessionConfig = {
   secret: process.env.SESSION_SECRET || "fallback-secret",
   resave: false,
   saveUninitialized: true,
   cookie: {
-    secure: true, // Fuerza HTTPS en producción
-    sameSite: 'none', // Necesario para cross-site
-    maxAge: 24 * 60 * 60 * 1000 // 1 día en ms
+    secure: true, // Force HTTPS in production
+    sameSite: 'none', // Necessary for cross-site
+    maxAge: 24 * 60 * 60 * 1000 // 1 day in ms
   }
 };
 
-// Solo en producción usamos MongoDB para sesiones
+// MongoDB for Sessions (Production)
 if (process.env.NODE_ENV === 'production') {
   sessionConfig.store = MongoStore.create({
     mongoUrl: process.env.MONGO_URI,
-    ttl: 24 * 60 * 60 // 1 día en segundos
+    ttl: 24 * 60 * 60 // 1 day in seconds
   });
 }
 
@@ -63,7 +62,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Rutas de autenticación (sin cambios)
+// Authentication routes
 app.get('/login', (req, res) => {
   res.send('<a href="/auth/github">Login con GitHub</a>');
 });
@@ -85,7 +84,7 @@ app.get('/logout', (req, res) => {
   });
 });
 
-// Rutas principales (sin cambios)
+// Main routes
 app.get('/', (req, res) => {
   if (req.user) {
     const name = req.user.displayName || req.user.username;
@@ -103,7 +102,7 @@ app.get('/profile', (req, res) => {
   }
 });
 
-// Configuración Swagger (sin cambios)
+// Swagger configuration
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -118,12 +117,12 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Rutas protegidas (sin cambios)
+// Protected routes
 app.use('/api/products', isAuthenticated, productRoutes);
 app.use('/api/users', isAuthenticated, userRoutes);
 app.use('/', indexRoutes);
 
-// Conexión a MongoDB
+// Connecting to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('MongoDB connected');
